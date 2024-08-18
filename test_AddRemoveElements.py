@@ -64,3 +64,15 @@ def test_drag_and_drop(setup):
     target = WebDriverWait(setup,20).until(EC.element_to_be_clickable((By.XPATH,"//*[@id='column-b']")))
     ActionChains(setup).drag_and_drop(source,target).perform()
 
+def test_dynamic_content(setup):
+    setup.find_element(By.LINK_TEXT,"Dynamic Content").click()
+    images = setup.find_elements(By.XPATH,"//*[@class='large-10 columns large-centered']/div/div/child::img")
+    texts = setup.find_elements(By.XPATH,"//*[@class='large-10 columns large-centered']/div/div/child::img/following::div[@class='large-10 columns']")
+    size = len(images)
+
+    for img in images:
+        print(img.get_attribute("src"))
+
+    for t in texts:
+        print(t.text)
+
