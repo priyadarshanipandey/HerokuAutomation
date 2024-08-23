@@ -4,6 +4,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import re
 
 
 @pytest.fixture
@@ -75,4 +76,29 @@ def test_dynamic_content(setup):
 
     for t in texts:
         print(t.text)
+
+def test_dynamic_controls(setup):
+    setup.find_element(By.LINK_TEXT,"Dynamic Controls").click()
+    cbox_status = setup.find_element(By.ID,"checkbox").get_attribute("checked")
+    if cbox_status == None:
+        setup.find_element(By.ID,"checkbox").click()
+    setup.find_element(By.XPATH,"//button[text()='Remove']").click()
+
+    tbox_status = setup.find_element(By.XPATH,"//*[@id='input-example']/child::input").get_attribute("disabled")
+    if tbox_status == "true":
+        setup.find_element(By.XPATH,"//button[text()='Enable']").click()
+
+    wait = WebDriverWait(setup,20).until(EC.element_to_be_clickable((By.XPATH,"//*[@id='input-example']/child::input")))
+    setup.find_element(By.XPATH,"//*[@id='input-example']/child::input").click()
+    setup.find_element(By.XPATH, "//*[@id='input-example']/child::input").send_keys("Entering text")
+
+def test_dynamic_loading(setup):
+    setup.find_element(By.LINK_TEXT,"Dynamic Loading").click()
+    setup.find_element(By.LINK_TEXT,"Example 1: Element on page that is hidden").click()
+    hidden_element = setup.find_element(By.XPATH,"//*[@id='finish']")
+    display_status = setup.find_element(By.XPATH,"//*[@id='finish']").get_attribute("style")
+    comp = display_status == 'display: none;'
+    if display_status == 'display: none;':
+        setup.execute_script("arguments[0].setAttribute('style','display: block;')",hidden_element)
+    wait = WebDriverWait(setup,20).until(EC.presence_of_element_located((By.XPATH,"//*[@id='finish']")))
 
