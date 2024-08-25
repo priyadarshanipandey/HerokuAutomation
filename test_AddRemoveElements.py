@@ -1,10 +1,12 @@
 import pytest
 from selenium import webdriver
+from selenium.common import MoveTargetOutOfBoundsException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import re
+import ait
+import time
 
 
 @pytest.fixture
@@ -101,4 +103,25 @@ def test_dynamic_loading(setup):
     if display_status == 'display: none;':
         setup.execute_script("arguments[0].setAttribute('style','display: block;')",hidden_element)
     wait = WebDriverWait(setup,20).until(EC.presence_of_element_located((By.XPATH,"//*[@id='finish']")))
+
+def test_entry_ad(setup):
+    setup.find_element(By.LINK_TEXT,"Entry Ad").click()
+    setup.find_element(By.XPATH,"//h3[text()='Entry Ad']").click()
+    restart_ad = setup.find_element(By.ID,"restart-ad")
+    setup.execute_script("arguments[0].setAttribute('style','display:block;')",restart_ad)
+
+
+def test_exit_intent(setup):
+    setup.find_element(By.LINK_TEXT,"Exit Intent").click()
+    window_size = setup.get_window_size()
+    width = window_size['width']
+    height = window_size['height']
+    width_click = width-1000
+    height_click = height - (height-5)
+    ait.move(1000, 5)
+    modal = setup.find_element(By.XPATH,"//*[@id = 'ouibounce-modal']")
+    if modal.is_displayed():
+        print("Modal dialog is opened")
+    else:
+        print("Failed")
 
